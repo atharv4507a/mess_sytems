@@ -16,10 +16,12 @@ const generateToken = (id) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log(`Login attempt for: ${email}`);
 
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
+            console.log(`Login successful: ${email}`);
             handle200(res, {
                 _id: user.id,
                 name: user.name,
@@ -27,9 +29,11 @@ const loginUser = async (req, res) => {
                 token: generateToken(user._id),
             });
         } else {
+            console.warn(`Login failed: Invalid credentials for ${email}`);
             handle422(res, 'Invalid credentials');
         }
     } catch (error) {
+        console.error(`Login error for ${req.body?.email || 'unknown user'}:`, error);
         handle500(res, error);
     }
 };

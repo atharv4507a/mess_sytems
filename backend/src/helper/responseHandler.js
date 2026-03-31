@@ -32,8 +32,12 @@ const handle422 = (res, error) => {
 };
 
 const handle500 = (res, error) => {
+    console.error("Internal Server Error:", error);
     const message = typeof error === 'string' ? error : (error?.message || "Internal Server Error");
-    return res.status(500).json({ message });
+    return res.status(500).json({ 
+        message,
+        error: process.env.NODE_ENV === 'production' ? undefined : error 
+    });
 };
 
 module.exports = {

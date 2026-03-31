@@ -15,6 +15,16 @@ connectMongoDB();
 // Serve frontend static files from the build directory
 app.use(express.static(path.join(__dirname, 'public/frontend')));
 
+const mongoose = require('mongoose');
+
+// health check route
+app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        database: mongoose.connection && mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    });
+});
+
 // API Routes
 app.use('/api', require('./src/routes/index'));
 

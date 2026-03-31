@@ -11,6 +11,8 @@ const generateToken = (id) => {
     });
 };
 
+const { connectMongoDB } = require('../config/mongoDB');
+
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
@@ -19,10 +21,10 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         console.log(`Login attempt for: ${email}`);
 
-        // Check if DB is connected
-        if (mongoose.connection && mongoose.connection.readyState !== 1) {
-            console.error("Database not connected during login attempt");
-            return handle500(res, "Database not connected. Please check MONGODB_URI.");
+        // Ensure DB is connected (important for serverless functions)
+        if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+            console.log("Database not connected, attempting to connect...");
+            await connectMongoDB();
         }
 
         const user = await User.findOne({ email }).maxTimeMS(5000); // 5 seconds timeout

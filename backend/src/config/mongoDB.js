@@ -1,4 +1,11 @@
 const mongoose = require('mongoose');
+require("../models/tiffin.model");
+require("../models/bill.model");
+require("../models/expense.model");
+require("../models/leave.model");
+require("../models/member.model");
+require("../models/payment.model");
+require("../models/user.model");
 
 const connectMongoDB = async () => {
     try {

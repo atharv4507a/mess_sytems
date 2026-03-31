@@ -18,6 +18,11 @@ app.use(express.static(path.join(__dirname, 'public/frontend')));
 // API Routes
 app.use('/api', require('./src/routes/index'));
 
+// Root Route
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
+
 // Catch-all route for SPA navigation (Express 5 compatible)
 app.get('/*path', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/frontend', 'index.html'));

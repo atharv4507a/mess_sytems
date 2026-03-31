@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const { handle200, handle422, handle500 } = require('../helper/responseHandler');
 
@@ -18,7 +19,13 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         console.log(`Login attempt for: ${email}`);
 
-        const user = await User.findOne({ email });
+        // Check if DB is connected
+        if (mongoose.connection && mongoose.connection.readyState !== 1) {
+            console.error("Database not connected during login attempt");
+            return handle500(res, "Database not connected. Please check MONGODB_URI.");
+        }
+
+        const user = await User.findOne({ email }).maxTimeMS(5000); // 5 seconds timeout
 
         if (user && (await bcrypt.compare(password, user.password))) {
             console.log(`Login successful: ${email}`);

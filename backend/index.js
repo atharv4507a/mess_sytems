@@ -10,7 +10,14 @@ app.use(express.json());
 app.use(cors());
 
 // Connect to MongoDB
-connectMongoDB();
+connectMongoDB().catch(err => console.error("Initial MongoDB Connection Failed:", err.message));
+
+// Environment Variable Validation
+const requiredEnv = ['MONGODB_URI', 'JWT_SECRET'];
+const missingEnv = requiredEnv.filter(env => !process.env[env]);
+if (missingEnv.length > 0) {
+    console.error(`ERROR: Missing required environment variables: ${missingEnv.join(', ')}`);
+}
 
 // Serve frontend static files from the build directory
 app.use(express.static(path.join(__dirname, 'public/frontend')));
@@ -18,10 +25,23 @@ app.use(express.static(path.join(__dirname, 'public/frontend')));
 const mongoose = require('mongoose');
 
 // health check route
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+    let dbStatus = 'Disconnected';
+    try {
+        if (mongoose.connection && mongoose.connection.readyState === 1) {
+            // Test actual connectivity
+            await mongoose.connection.db.admin().ping();
+            dbStatus = 'Connected';
+        }
+    } catch (err) {
+        dbStatus = `Error: ${err.message}`;
+    }
+
     res.status(200).json({
         status: 'OK',
-        database: mongoose.connection && mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+        database: dbStatus,
+        env: process.env.NODE_ENV,
+        missing_vars: missingEnv.length > 0 ? missingEnv : undefined
     });
 });
 

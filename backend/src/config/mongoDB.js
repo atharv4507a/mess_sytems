@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 let cachedConnection = null;
 
@@ -9,12 +9,18 @@ const connectMongoDB = async () => {
     }
 
     try {
-        const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/messDataBase';
+        const mongoURI = process.env.MONGODB_URI;
+        if (!mongoURI) throw new Error("MONGODB_URI is not defined in environment");
+        
+        // Log the URI but censor the password for security
+        const censoredURI = mongoURI.replace(/:([^:@]+)@/, ':****@');
+        console.log(`[DEBUG] Attempting connection with URI: ${censoredURI}`);
 
         // Options for robust connection
         const options = {
-            serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+            serverSelectionTimeoutMS: 5000, 
             socketTimeoutMS: 45000,
+            family: 4 // Force IPv4 for DNS resolution
         };
 
         const conn = await mongoose.connect(mongoURI, options);

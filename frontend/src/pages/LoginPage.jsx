@@ -20,7 +20,7 @@ export default function LoginPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const success = login(email, password);
+    const success = await login(email, password);
     if (!success) {
       setError('Invalid email or password');
       JSONNotify.error('Invalid email or password');

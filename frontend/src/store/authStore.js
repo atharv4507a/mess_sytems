@@ -13,7 +13,7 @@ export const useAuthStore = create(
       login: async (email, password) => {
         try {
           const response = await api.post('/auth/login', { email, password });
-          const { token, user } = response.data;
+          const { token, ...user } = response.data;
           
           localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(user));

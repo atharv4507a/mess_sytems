@@ -1,34 +1,36 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-const Member = require('./src/models/member.model');
+const bcrypt = require('bcryptjs');
+const User = require('./src/models/user.model');
 
-const seedMember = async () => {
+const seedAdmin = async () => {
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/messDataBase');
-        console.log('MongoDB Connected for Seeding');
+        await mongoose.connect(process.env.MONGODB_URI, { family: 4 });
+        console.log('✅ MongoDB Connected for Seeding');
 
-        // Check if test member exists
-        const total = await Member.countDocuments();
-        if (total === 0) {
-            await Member.create({
-                name: "Test Member",
-                mobile: "9876543210",
-                address: "Sample Address, Pune",
-                joiningDate: new Date().toISOString().split('T')[0],
-                status: "active",
-                messType: "monthly",
-                foodType: "veg",
-                monthlyCharge: 3000
-            });
-            console.log('✅ Test Member added to Database!');
-        } else {
-            console.log('DB already has members. No seeding needed.');
+        // Check if admin already exists
+        const existing = await User.findOne({ email: 'admin@mess.com' });
+        if (existing) {
+            console.log('⚠️  Admin user already exists. Skipping seed.');
+            process.exit();
         }
 
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+
+        await User.create({
+            name: 'Admin',
+            email: 'admin@mess.com',
+            password: hashedPassword,
+        });
+
+        console.log('✅ Admin user created successfully!');
+        console.log('   Email   : admin@mess.com');
+        console.log('   Password: admin123');
         process.exit();
     } catch (error) {
-        console.error('Error seeding data:', error);
+        console.error('❌ Error seeding admin:', error.message);
         process.exit(1);
     }
 };
 
-seedMember();
+seedAdmin();

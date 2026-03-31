@@ -38,7 +38,7 @@ const loginUser = async (req, res) => {
                 token: generateToken(user._id),
             });
         } else {
-            console.warn(`Login failed: Invalid credentials for ${email}`);
+            console.log(`Login failed: Invalid credentials for ${email}`);
             handle422(res, 'Invalid credentials');
         }
     } catch (error) {

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 let cachedConnection = null;
 
@@ -9,11 +10,11 @@ const connectMongoDB = async () => {
 
     try {
         const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/messDataBase';
-        
+
         // Options for robust connection
         const options = {
             serverSelectionTimeoutMS: 5000, // 5 seconds timeout
-            socketTimeoutMS: 45000, 
+            socketTimeoutMS: 45000,
         };
 
         const conn = await mongoose.connect(mongoURI, options);

@@ -129,12 +129,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-            <p className="text-sm text-emerald-300 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-xs text-slate-400">Email: admin@mess.com</p>
-            <p className="text-xs text-slate-400">Password: admin123</p>
-          </div>
+
         </div>
       </motion.div>
     </div>
